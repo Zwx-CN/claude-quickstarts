@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 760">
+  <rect x="0" y="0" width="1280" height="760" fill="#fff7ed"/>
+  <text x="640" y="58" text-anchor="middle" font-size="34" font-weight="700" fill="#1f2937">Qwen Computer Use Harness</text>
+  <text x="640" y="92" text-anchor="middle" font-size="18" fill="#6b7280">没有原生 CU API 时，用 prompt + parser + pyautogui 补出工具层</text>
+
+  <circle cx="160" cy="210" r="70" fill="#dbeafe" stroke="#2563eb" stroke-width="4"/>
+  <text x="160" y="200" text-anchor="middle" font-size="20" font-weight="700" fill="#1e3a8a">截图</text>
+  <text x="160" y="230" text-anchor="middle" font-size="14" fill="#1d4ed8">obs["screenshot"]</text>
+
+  <rect x="300" y="150" width="220" height="120" rx="20" fill="#dcfce7" stroke="#16a34a" stroke-width="4"/>
+  <text x="410" y="190" text-anchor="middle" font-size="21" font-weight="700" fill="#14532d">Image / History</text>
+  <text x="410" y="220" text-anchor="middle" font-size="14" fill="#166534">resize, base64</text>
+  <text x="410" y="244" text-anchor="middle" font-size="14" fill="#166534">1000x1000 relative 坐标</text>
+
+  <rect x="590" y="150" width="220" height="120" rx="20" fill="#ede9fe" stroke="#7c3aed" stroke-width="4"/>
+  <text x="700" y="190" text-anchor="middle" font-size="21" font-weight="700" fill="#4c1d95">Prompt / Tools</text>
+  <text x="700" y="220" text-anchor="middle" font-size="14" fill="#5b21b6">computer_use schema</text>
+  <text x="700" y="244" text-anchor="middle" font-size="14" fill="#5b21b6">Action + tool_call</text>
+
+  <rect x="880" y="150" width="240" height="120" rx="20" fill="#fee2e2" stroke="#dc2626" stroke-width="4"/>
+  <text x="1000" y="190" text-anchor="middle" font-size="21" font-weight="700" fill="#7f1d1d">Qwen VL API</text>
+  <text x="1000" y="220" text-anchor="middle" font-size="14" fill="#991b1b">OpenAI-compatible</text>
+  <text x="1000" y="244" text-anchor="middle" font-size="14" fill="#991b1b">DashScope 也可兼容</text>
+
+  <rect x="880" y="430" width="240" height="120" rx="20" fill="#fef3c7" stroke="#f59e0b" stroke-width="4"/>
+  <text x="1000" y="470" text-anchor="middle" font-size="21" font-weight="700" fill="#78350f">Parser</text>
+  <text x="1000" y="500" text-anchor="middle" font-size="14" fill="#92400e">XML / JSON tool_call</text>
+  <text x="1000" y="524" text-anchor="middle" font-size="14" fill="#92400e">坐标缩放与动作校验</text>
+
+  <rect x="590" y="430" width="220" height="120" rx="20" fill="#ccfbf1" stroke="#0d9488" stroke-width="4"/>
+  <text x="700" y="470" text-anchor="middle" font-size="21" font-weight="700" fill="#134e4a">Actions</text>
+  <text x="700" y="500" text-anchor="middle" font-size="14" fill="#115e59">pyautogui.click</text>
+  <text x="700" y="524" text-anchor="middle" font-size="14" fill="#115e59">WAIT / DONE / FAIL</text>
+
+  <rect x="300" y="430" width="220" height="120" rx="20" fill="#e0f2fe" stroke="#0284c7" stroke-width="4"/>
+  <text x="410" y="470" text-anchor="middle" font-size="21" font-weight="700" fill="#0c4a6e">env.step</text>
+  <text x="410" y="500" text-anchor="middle" font-size="14" fill="#075985">HTTP execute</text>
+  <text x="410" y="524" text-anchor="middle" font-size="14" fill="#075985">返回下一帧截图</text>
+
+  <polyline points="230,210 300,210" fill="none" stroke="#374151" stroke-width="4"/>
+  <polyline points="520,210 590,210" fill="none" stroke="#374151" stroke-width="4"/>
+  <polyline points="810,210 880,210" fill="none" stroke="#374151" stroke-width="4"/>
+  <polyline points="1000,270 1000,430" fill="none" stroke="#374151" stroke-width="4"/>
+  <polyline points="880,490 810,490" fill="none" stroke="#374151" stroke-width="4"/>
+  <polyline points="590,490 520,490" fill="none" stroke="#374151" stroke-width="4"/>
+  <polyline points="410,430 410,350 160,350 160,280" fill="none" stroke="#374151" stroke-width="4"/>
+</svg>

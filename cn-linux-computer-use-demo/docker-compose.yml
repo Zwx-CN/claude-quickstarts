@@ -1,0 +1,21 @@
+services:
+  cn-linux-cu-demo:
+    build: .
+    environment:
+      DISPLAY: ":99"
+      CU_MODEL_PROVIDER: "${CU_MODEL_PROVIDER:-qwen}"
+      CU_DESKTOP_PROVIDER: "${CU_DESKTOP_PROVIDER:-docker}"
+      CU_DEPLOY_PROFILE: "${CU_DEPLOY_PROFILE:-local-docker}"
+      CU_SCREEN_WIDTH: "1280"
+      CU_SCREEN_HEIGHT: "720"
+      CU_MAX_STEPS: "30"
+      CU_TRACE_DIR: "/app/experiments/traces"
+      QWEN_BASE_URL: "${QWEN_BASE_URL:-https://dashscope.aliyuncs.com/compatible-mode/v1}"
+      QWEN_API_KEY: "${QWEN_API_KEY:-}"
+      QWEN_MODEL: "${QWEN_MODEL:-qwen3.7-plus}"
+    ports:
+      - "8000:8000"
+      - "6080:6080"
+      - "5900:5900"
+    volumes:
+      - ./experiments:/app/experiments

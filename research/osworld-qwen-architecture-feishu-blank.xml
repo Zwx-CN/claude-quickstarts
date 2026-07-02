@@ -1,0 +1,136 @@
+<title>OSWorld / OSWorld-V2 Qwen Computer Use 架构调研</title>
+
+<h1>OSWorld / OSWorld-V2 Qwen Computer Use 架构调研</h1>
+
+<p>调研时间：2026-07-02<br/>范围：本地仓库 <code>/Users/vaehoho/go/src/Zwx-CN/OSWorld</code> 与 <code>/Users/vaehoho/go/src/Zwx-CN/OSWorld-V2</code>。<br/>安全说明：本次只做源码与工具调研，没有调用任何 LLM。</p>
+
+<h2>0. 结论先行</h2>
+<ol>
+  <li>OSWorld 不是一个单纯的 Qwen harness，而是完整评测框架：runner 负责并发与任务分发，<code>DesktopEnv</code> 负责 VM/provider/controller/evaluator，agent 只要实现 <code>predict(instruction, obs) -&gt; (response, actions)</code> 就能接入。</li>
+  <li>Qwen 没有依赖原生 Computer Use API。OSWorld 的方式是把截图和工具 schema 发给 OpenAI-compatible 或 DashScope-compatible Chat Completions，让模型输出 <code>computer_use</code> 调用，再由本地 parser 转成 <code>pyautogui</code> 执行。</li>
+  <li>最值得借鉴的是 OSWorld 当前仓库里的新模块化 <code>mm_agents/qwen/</code>，它把 prompt、history、image、parser、action、client 拆开了。</li>
+  <li>OSWorld-V2 的 benchmark 执行器更成熟，但本地代码没有发现 <code>mm_agents/qwen/</code> 和 <code>scripts/python/run_multienv_qwen.py</code>；V2 里 Qwen 主要散在 <code>qwen25vl_agent.py</code>、<code>qwen3vl_agent.py</code>、<code>qwen35vl_agent.py</code>、<code>qwen_internal_agent.py</code>。</li>
+  <li>我们的 demo 不建议直接搬整套 OSWorld。应该学习它的 harness 形状和 provider 边界，保留当前轻量 VM/control server 路线。</li>
+</ol>
+
+<h2>1. OSWorld 全貌</h2>
+<p>OSWorld 的核心是一个可替换 agent、可替换 provider 的桌面任务评测框架。runner 读取任务集，创建 <code>DesktopEnv</code> 和 agent，然后循环执行：截图观察、模型预测、动作执行、结果记录、最终评估。</p>
+
+<whiteboard type="blank"></whiteboard>
+
+<h2>2. Qwen 相关流程</h2>
+<p>OSWorld 的 Qwen 路线本质是本地 harness：Qwen 模型只负责看截图、按 prompt 输出工具调用；坐标缩放、动作解析、执行与验证都由本地代码完成。</p>
+
+<whiteboard type="blank"></whiteboard>
+
+<h2>3. OSWorld 当前仓库里的 Qwen 包</h2>
+<p>当前 OSWorld 仓库中存在新的模块化 Qwen 包：</p>
+<ul>
+  <li><code>mm_agents/qwen/main.py</code>：<code>QwenAgent</code> 与公共基类，负责 <code>predict</code> 主流程。</li>
+  <li><code>mm_agents/qwen/prompts.py</code>：构造 <code>computer_use</code> 工具 schema 和 system prompt。</li>
+  <li><code>mm_agents/qwen/history.py</code>：构造多模态 messages，并用 <code>image_max</code> / <code>fold_size</code> 折叠旧截图。</li>
+  <li><code>mm_agents/qwen/images.py</code>：截图 resize/base64，以及 relative/absolute 坐标缩放。</li>
+  <li><code>mm_agents/qwen/parser.py</code> 与 <code>actions.py</code>：解析 XML tool call，并生成 <code>pyautogui</code> 代码。</li>
+  <li><code>mm_agents/qwen/client.py</code>：OpenAI-compatible Chat Completions 调用、timeout、retry、reasoning_content 合并。</li>
+</ul>
+
+<p>直接证据：<code>mm_agents/qwen/README.md</code> 里给出的 runner 示例是：</p>
+<pre lang="bash"><code>python scripts/python/run_multienv_qwen.py \
+  --model qwen3.7-plus \
+  --base_url "$OPENAI_BASE_URL" \
+  --api_key "$OPENAI_API_KEY"</code></pre>
+
+<p>这说明这里的 <code>qwen3.7-plus</code> 是 OpenAI-compatible endpoint 里的模型名，不是 OSWorld 原生的 CU 后端。</p>
+
+<h2>4. OSWorld-V2 的变化</h2>
+<p>V2 的核心变化不在 Qwen，而在 benchmark 执行器、任务生命周期和评测能力。</p>
+
+<whiteboard type="blank"></whiteboard>
+
+<h2>5. V1/当前 OSWorld 与 V2 对比</h2>
+<table>
+  <thead>
+    <tr>
+      <th background-color="light-gray">维度</th>
+      <th background-color="light-gray">OSWorld 当前仓库</th>
+      <th background-color="light-gray">OSWorld-V2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Qwen 推荐入口</td>
+      <td><code>mm_agents/qwen.QwenAgent</code> + <code>run_multienv_qwen.py</code></td>
+      <td>未发现同名 runner；按 V2 README 应从 Claude/GPT runner 迁移</td>
+    </tr>
+    <tr>
+      <td>Qwen 代码组织</td>
+      <td>模块化包，职责拆得清楚</td>
+      <td>多个单文件 agent，另有 <code>qwen_internal_agent.py</code></td>
+    </tr>
+    <tr>
+      <td>API 形态</td>
+      <td>OpenAI-compatible，支持 <code>OPENAI_BASE_URL</code> / <code>OPENAI_API_KEY</code></td>
+      <td>Qwen35/internal 用 OpenAI-compatible；Maestro 用 DashScope env</td>
+    </tr>
+    <tr>
+      <td>输出格式</td>
+      <td>XML <code>&lt;tool_call&gt;&lt;function=computer_use&gt;</code></td>
+      <td>Qwen3/25 多为 JSON-in-XML；Qwen35/internal 为 XML parameter</td>
+    </tr>
+    <tr>
+      <td>评测执行器</td>
+      <td>reset -&gt; predict -&gt; step -&gt; evaluate</td>
+      <td>多阶段、用户模拟器、checkpoint、memory tracing</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>6. 对我们 demo 的建议路线</h2>
+<p>建议用 OSWorld 的 Qwen agent 设计做参考实现，用 OSWorld-V2 的执行器设计做未来路线图，当前 demo 保持轻量。</p>
+<ol>
+  <li>第一阶段：把现有 demo 改成 OSWorld-like harness。输入是 <code>instruction + screenshot + previous actions</code>，输出 typed actions，而不是散落的 pyautogui 字符串。</li>
+  <li>第二阶段：保留 provider 抽象。当前先走 <code>visible_utm_x11</code>，后续加 <code>xvfb_novnc</code> 和 <code>docker_osworld_like</code>。</li>
+  <li>第三阶段：补 trace/replay。每步保存 screenshot、model response、parsed action、execution result。</li>
+  <li>第四阶段：参考 V2 做 evaluator-lite。先支持人工判断或简单视觉/文件断言，后续再接 benchmark 风格 evaluator。</li>
+</ol>
+
+<h2>7. 现在该抄什么，不该抄什么</h2>
+<grid>
+  <column width-ratio="0.5">
+    <h3>现在该抄</h3>
+    <ul>
+      <li>Qwen harness 的分层：PromptBuilder、MessageHistory、ImagePreprocessor、ToolCallParser、ActionExecutor。</li>
+      <li><code>predict -&gt; actions -&gt; env.step -&gt; obs</code> 的主循环。</li>
+      <li>1000x1000 relative coordinate 思路。</li>
+      <li>message dump、trace、截图落盘。</li>
+      <li><code>WAIT</code> / <code>DONE</code> / <code>FAIL</code> 特殊动作。</li>
+    </ul>
+  </column>
+  <column width-ratio="0.5">
+    <h3>暂时不该抄</h3>
+    <ul>
+      <li>不要直接搬完整 benchmark 任务/evaluator 体系。</li>
+      <li>不要一开始实现 snapshot/revert、多云 provider、checkpoint eval。</li>
+      <li>不要把任意 <code>pyautogui</code> 字符串执行暴露成产品接口。</li>
+      <li>不要继续依赖 <code>typewrite</code> 输入中文，应新增 clipboard paste typed action。</li>
+    </ul>
+  </column>
+</grid>
+
+<h2>8. 关键源码索引</h2>
+<ul>
+  <li>OSWorld Qwen README：<code>/Users/vaehoho/go/src/Zwx-CN/OSWorld/mm_agents/qwen/README.md</code></li>
+  <li>OSWorld Qwen 主实现：<code>/Users/vaehoho/go/src/Zwx-CN/OSWorld/mm_agents/qwen/main.py</code></li>
+  <li>OSWorld Qwen prompt/history/image/parser/action/client：<code>prompts.py</code>、<code>history.py</code>、<code>images.py</code>、<code>parser.py</code>、<code>actions.py</code>、<code>client.py</code></li>
+  <li>OSWorld Qwen runner：<code>/Users/vaehoho/go/src/Zwx-CN/OSWorld/scripts/python/run_multienv_qwen.py</code></li>
+  <li>OSWorld 单任务执行：<code>/Users/vaehoho/go/src/Zwx-CN/OSWorld/lib_run_single.py</code></li>
+  <li>OSWorld DesktopEnv：<code>/Users/vaehoho/go/src/Zwx-CN/OSWorld/desktop_env/desktop_env.py</code></li>
+  <li>OSWorld controller/server：<code>desktop_env/controllers/python.py</code>、<code>desktop_env/server/main.py</code></li>
+  <li>OSWorld-V2 执行器：<code>/Users/vaehoho/go/src/Zwx-CN/OSWorld-V2/lib_run_single.py</code></li>
+  <li>OSWorld-V2 Qwen：<code>qwen35vl_agent.py</code>、<code>qwen_internal_agent.py</code>、<code>qwen3vl_agent.py</code>、<code>qwen25vl_agent.py</code></li>
+  <li>OSWorld-V2 Maestro Qwen engine：<code>/Users/vaehoho/go/src/Zwx-CN/OSWorld-V2/mm_agents/maestro/core/engine.py</code></li>
+</ul>
+
+<h2>9. 最后的判断</h2>
+<p>如果目标是让国产视觉模型操作 Linux 桌面，OSWorld 已经证明这条路可以跑通：不需要模型原生 Computer Use，只需要一个足够稳的 screenshot-to-tool-call harness。</p>
+<p>我们的策略应是：短期复用 OSWorld 的 Qwen harness 设计，继续跑轻量 UTM/X11 demo；中期补专用 <code>:99 Xvfb/noVNC</code> provider；长期再吸收 OSWorld-V2 的 trace、checkpoint 和 evaluator 设计。</p>

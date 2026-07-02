@@ -1,0 +1,12 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+research/final_doc_fetch.json
+research/lark-*-qrcode.png
+research/lark_chunks/
+research/lark-svg-smoke*.xml

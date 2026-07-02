@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 760">
+  <rect x="0" y="0" width="1280" height="760" fill="#f8fafc"/>
+  <text x="640" y="58" text-anchor="middle" font-size="34" font-weight="700" fill="#0f172a">OSWorld 运行全貌</text>
+  <text x="640" y="94" text-anchor="middle" font-size="18" fill="#475569">任务集、Agent、DesktopEnv、Provider、Controller、Evaluator 共同组成闭环</text>
+
+  <rect x="60" y="160" width="210" height="92" rx="18" fill="#dbeafe" stroke="#2563eb" stroke-width="3"/>
+  <text x="165" y="197" text-anchor="middle" font-size="22" font-weight="700" fill="#1e3a8a">任务 JSON</text>
+  <text x="165" y="226" text-anchor="middle" font-size="15" fill="#1d4ed8">instruction / config / evaluator</text>
+
+  <rect x="330" y="145" width="230" height="122" rx="20" fill="#ede9fe" stroke="#7c3aed" stroke-width="3"/>
+  <text x="445" y="185" text-anchor="middle" font-size="23" font-weight="700" fill="#4c1d95">Runner</text>
+  <text x="445" y="215" text-anchor="middle" font-size="15" fill="#5b21b6">run_multienv_*.py</text>
+  <text x="445" y="240" text-anchor="middle" font-size="15" fill="#5b21b6">并发 / 任务分发 / 结果目录</text>
+
+  <rect x="630" y="135" width="260" height="142" rx="22" fill="#dcfce7" stroke="#16a34a" stroke-width="3"/>
+  <text x="760" y="176" text-anchor="middle" font-size="24" font-weight="700" fill="#14532d">DesktopEnv</text>
+  <text x="760" y="208" text-anchor="middle" font-size="15" fill="#166534">reset / _get_obs / step / evaluate</text>
+  <text x="760" y="233" text-anchor="middle" font-size="15" fill="#166534">统一封装 VM 与评测逻辑</text>
+
+  <rect x="970" y="145" width="230" height="122" rx="20" fill="#ffedd5" stroke="#f97316" stroke-width="3"/>
+  <text x="1085" y="185" text-anchor="middle" font-size="23" font-weight="700" fill="#7c2d12">Agent</text>
+  <text x="1085" y="215" text-anchor="middle" font-size="15" fill="#9a3412">predict(instruction, obs)</text>
+  <text x="1085" y="240" text-anchor="middle" font-size="15" fill="#9a3412">返回 response + actions</text>
+
+  <rect x="110" y="420" width="250" height="132" rx="20" fill="#cffafe" stroke="#0891b2" stroke-width="3"/>
+  <text x="235" y="460" text-anchor="middle" font-size="23" font-weight="700" fill="#164e63">Provider</text>
+  <text x="235" y="490" text-anchor="middle" font-size="15" fill="#155e75">docker / vmware / aws</text>
+  <text x="235" y="515" text-anchor="middle" font-size="15" fill="#155e75">aliyun / volcengine / fastvm</text>
+
+  <rect x="430" y="420" width="250" height="132" rx="20" fill="#fef9c3" stroke="#ca8a04" stroke-width="3"/>
+  <text x="555" y="460" text-anchor="middle" font-size="23" font-weight="700" fill="#713f12">VM 内 Server</text>
+  <text x="555" y="490" text-anchor="middle" font-size="15" fill="#854d0e">Flask HTTP 控制面</text>
+  <text x="555" y="515" text-anchor="middle" font-size="15" fill="#854d0e">/screenshot /execute /run_python</text>
+
+  <rect x="750" y="420" width="230" height="132" rx="20" fill="#fee2e2" stroke="#dc2626" stroke-width="3"/>
+  <text x="865" y="460" text-anchor="middle" font-size="23" font-weight="700" fill="#7f1d1d">Controller</text>
+  <text x="865" y="490" text-anchor="middle" font-size="15" fill="#991b1b">HTTP 调 VM server</text>
+  <text x="865" y="515" text-anchor="middle" font-size="15" fill="#991b1b">截图 / pyautogui / 文件</text>
+
+  <rect x="1040" y="420" width="180" height="132" rx="20" fill="#e2e8f0" stroke="#64748b" stroke-width="3"/>
+  <text x="1130" y="460" text-anchor="middle" font-size="23" font-weight="700" fill="#334155">Evaluator</text>
+  <text x="1130" y="490" text-anchor="middle" font-size="15" fill="#475569">getters + metrics</text>
+  <text x="1130" y="515" text-anchor="middle" font-size="15" fill="#475569">最终评分</text>
+
+  <polyline points="270,206 330,206" fill="none" stroke="#334155" stroke-width="4"/>
+  <polyline points="560,206 630,206" fill="none" stroke="#334155" stroke-width="4"/>
+  <polyline points="890,206 970,206" fill="none" stroke="#334155" stroke-width="4"/>
+  <polyline points="760,277 760,335 235,335 235,420" fill="none" stroke="#334155" stroke-width="4"/>
+  <polyline points="360,486 430,486" fill="none" stroke="#334155" stroke-width="4"/>
+  <polyline points="680,486 750,486" fill="none" stroke="#334155" stroke-width="4"/>
+  <polyline points="865,420 865,335 760,335 760,277" fill="none" stroke="#334155" stroke-width="4"/>
+  <polyline points="980,486 1040,486" fill="none" stroke="#334155" stroke-width="4"/>
+</svg>
